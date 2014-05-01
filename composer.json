@@ -1,0 +1,45 @@
+{
+    "name": "philiprehberger/laravel-correlation-id",
+    "description": "Laravel middleware that generates or propagates correlation IDs for request tracing with automatic log context injection.",
+    "keywords": ["laravel", "correlation-id", "request-id", "tracing", "logging", "middleware"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Philip Rehberger",
+            "email": "me@philiprehberger.com"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "illuminate/http": "^11.0|^12.0",
+        "illuminate/log": "^11.0|^12.0",
+        "illuminate/support": "^11.0|^12.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^9.0|^10.0",
+        "phpunit/phpunit": "^11.0",
+        "laravel/pint": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "PhilipRehberger\\CorrelationId\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PhilipRehberger\\CorrelationId\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "PhilipRehberger\\CorrelationId\\CorrelationIdServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true
+    }
+}
