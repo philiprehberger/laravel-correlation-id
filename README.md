@@ -154,11 +154,13 @@ This adds `correlation_id` to every Sentry event captured during the request, ma
 
 To disable Sentry integration without removing the package, set `'sentry' => false` in the config.
 
-## Testing
+## Development
 
 ```bash
 composer install
 vendor/bin/phpunit
+vendor/bin/pint --test
+vendor/bin/phpstan analyse
 ```
 
 ## License
