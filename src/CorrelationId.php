@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace PhilipRehberger\CorrelationId;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 
 class CorrelationId
@@ -17,7 +18,7 @@ class CorrelationId
     public static function get(): ?string
     {
         try {
-            /** @var \Illuminate\Http\Request $request */
+            /** @var Request $request */
             $request = App::make('request');
 
             $value = $request->attributes->get('correlation_id');
@@ -37,7 +38,7 @@ class CorrelationId
     public static function set(string $id): void
     {
         try {
-            /** @var \Illuminate\Http\Request $request */
+            /** @var Request $request */
             $request = App::make('request');
             $request->attributes->set('correlation_id', $id);
         } catch (\Throwable) {
