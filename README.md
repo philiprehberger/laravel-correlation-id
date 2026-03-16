@@ -1,5 +1,10 @@
 # laravel-correlation-id
 
+[![Tests](https://github.com/philiprehberger/laravel-correlation-id/actions/workflows/tests.yml/badge.svg)](https://github.com/philiprehberger/laravel-correlation-id/actions/workflows/tests.yml)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/philiprehberger/laravel-correlation-id.svg)](https://packagist.org/packages/philiprehberger/laravel-correlation-id)
+[![PHP Version Require](https://img.shields.io/packagist/php-v/philiprehberger/laravel-correlation-id.svg)](https://packagist.org/packages/philiprehberger/laravel-correlation-id)
+[![License](https://img.shields.io/github/license/philiprehberger/laravel-correlation-id)](LICENSE)
+
 Laravel middleware that generates or propagates correlation IDs for request tracing, with automatic log context injection and optional Sentry integration.
 
 ## What It Does
