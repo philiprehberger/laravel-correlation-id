@@ -8,6 +8,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Sentry\SentrySdk;
 use Symfony\Component\HttpFoundation\Response;
 
 class AddCorrelationId
@@ -29,7 +30,7 @@ class AddCorrelationId
         $request->attributes->set('correlation_id', $correlationId);
         Log::shareContext([$logContextKey => $correlationId]);
 
-        if (config('correlation-id.sentry', true) && class_exists(\Sentry\SentrySdk::class)) {
+        if (config('correlation-id.sentry', true) && class_exists(SentrySdk::class)) {
             \Sentry\configureScope(fn ($scope) => $scope->setTag('correlation_id', $correlationId));
         }
 
