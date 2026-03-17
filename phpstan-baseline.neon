@@ -1,0 +1,7 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Function Sentry\\configureScope not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: src/AddCorrelationId.php
