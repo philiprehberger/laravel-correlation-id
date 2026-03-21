@@ -1,6 +1,6 @@
 {
     "name": "philiprehberger/laravel-correlation-id",
-    "description": "Laravel middleware that generates or propagates correlation IDs for request tracing with automatic log context injection.",
+    "description": "Laravel middleware that generates or propagates correlation IDs for request tracing with automatic log context injection",
     "keywords": ["laravel", "correlation-id", "request-id", "tracing", "logging", "middleware"],
     "type": "library",
     "license": "MIT",
