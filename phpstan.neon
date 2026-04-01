@@ -7,3 +7,4 @@ parameters:
         - src
     excludePaths:
         - vendor
+        - src/Concerns

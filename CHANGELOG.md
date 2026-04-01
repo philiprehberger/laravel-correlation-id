@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-04-01
+
+### Added
+- Queue job propagation via `TracksCorrelationId` trait and `CorrelationIdJobMiddleware`
+- HTTP client propagation via `CorrelationId::httpMiddleware()`
+- Lightweight trace spans via `CorrelationId::startSpan()` and `spans()`
+
 ## [1.0.6] - 2026-03-31
 
 ### Changed
