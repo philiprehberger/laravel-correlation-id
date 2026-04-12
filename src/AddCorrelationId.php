@@ -7,7 +7,6 @@ namespace PhilipRehberger\CorrelationId;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use Sentry\SentrySdk;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -41,10 +40,23 @@ class AddCorrelationId
     }
 
     /**
+     * Clean up correlation state after the response has been sent.
+     *
+     * Called automatically by Laravel's terminable middleware pipeline.
+     * Essential for long-running processes (Octane, queue workers) to
+     * prevent state leaking between requests.
+     */
+    public function terminate(Request $request, Response $response): void
+    {
+        CorrelationId::reset();
+    }
+
+    /**
      * Resolve the correlation ID from the incoming request headers.
      *
      * Iterates through configured request header names in order,
-     * returning the first non-empty value found. Falls back to a new UUID.
+     * returning the first non-empty value found. Falls back to generating
+     * a new ID using the configured generator.
      */
     protected function resolveCorrelationId(Request $request): string
     {
@@ -58,6 +70,6 @@ class AddCorrelationId
             }
         }
 
-        return (string) Str::uuid();
+        return CorrelationId::generate();
     }
 }

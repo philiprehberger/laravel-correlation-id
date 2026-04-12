@@ -91,4 +91,80 @@ class CorrelationIdTest extends TestCase
 
         $this->assertNull(CorrelationId::get());
     }
+
+    public function test_generate_returns_uuid_by_default(): void
+    {
+        $id = CorrelationId::generate();
+
+        $this->assertMatchesRegularExpression(
+            '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i',
+            $id
+        );
+    }
+
+    public function test_generate_returns_uuid7_when_configured(): void
+    {
+        $this->app['config']->set('correlation-id.generator', 'uuid7');
+
+        $id = CorrelationId::generate();
+
+        $this->assertMatchesRegularExpression(
+            '/^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i',
+            $id
+        );
+    }
+
+    public function test_generate_returns_ulid_when_configured(): void
+    {
+        $this->app['config']->set('correlation-id.generator', 'ulid');
+
+        $id = CorrelationId::generate();
+
+        $this->assertMatchesRegularExpression('/^[0-9A-Z]{26}$/i', $id);
+    }
+
+    public function test_generate_uses_custom_callable(): void
+    {
+        $this->app['config']->set('correlation-id.generator', fn () => 'custom-fixed-id');
+
+        $id = CorrelationId::generate();
+
+        $this->assertSame('custom-fixed-id', $id);
+    }
+
+    public function test_reset_clears_request_attribute_and_spans(): void
+    {
+        $request = Request::create('/test', 'GET');
+        $this->app->instance('request', $request);
+
+        CorrelationId::set('will-be-cleared');
+        $span = CorrelationId::startSpan('test-span');
+        CorrelationId::endSpan($span);
+
+        $this->assertSame('will-be-cleared', CorrelationId::get());
+        $this->assertCount(1, CorrelationId::spans());
+
+        CorrelationId::reset();
+
+        $this->assertNull(CorrelationId::get());
+        $this->assertSame([], CorrelationId::spans());
+    }
+
+    public function test_request_macro_returns_correlation_id(): void
+    {
+        $request = Request::create('/test', 'GET');
+        $this->app->instance('request', $request);
+
+        CorrelationId::set('macro-test-id');
+
+        $this->assertSame('macro-test-id', $request->correlationId());
+    }
+
+    public function test_request_macro_returns_null_when_not_set(): void
+    {
+        $request = Request::create('/test', 'GET');
+        $this->app->instance('request', $request);
+
+        $this->assertNull($request->correlationId());
+    }
 }

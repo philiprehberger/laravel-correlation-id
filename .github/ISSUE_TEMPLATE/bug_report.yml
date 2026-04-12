@@ -14,6 +14,10 @@ body:
     attributes:
       label: Steps to reproduce
       description: Minimal code or steps to reproduce the issue
+      placeholder: |
+        use PhilipRehberger\CorrelationId\CorrelationId;
+
+        $id = CorrelationId::get();
     validations:
       required: true
   - type: textarea

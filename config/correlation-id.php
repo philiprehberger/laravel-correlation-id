@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
 
     /*
@@ -54,5 +56,18 @@ return [
     */
 
     'sentry' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | ID Generator
+    |--------------------------------------------------------------------------
+    |
+    | Controls how new correlation IDs are generated when no upstream header
+    | is present. Supported values: 'uuid' (UUID v4, default), 'uuid7'
+    | (UUID v7, time-ordered), 'ulid', or any callable that returns a string.
+    |
+    */
+
+    'generator' => 'uuid',
 
 ];

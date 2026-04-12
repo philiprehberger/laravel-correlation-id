@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-04-11
+
+### Added
+- Request macro `$request->correlationId()` for ergonomic access to the current correlation ID
+- Configurable ID generator via `generator` config key: supports `uuid` (v4), `uuid7` (v7), `ulid`, or custom callable
+- `CorrelationId::generate()` static method as public entry point for ID generation
+- `CorrelationId::reset()` static method to clear correlation state between requests
+- `terminate()` method on `AddCorrelationId` middleware for automatic cleanup in Octane and long-running processes
+
+### Changed
+- Standardize `pint.json` with `declare_strict_types`, `final_class`, and `ordered_imports` rules
+- Standardize `phpstan.neon` to analyze `src/Concerns/` and add `reportUnmatchedIgnoredErrors`
+- Standardize CI workflow: remove publish job, add branch patterns, fix job names, add memory limit
+- Standardize PR template with static analysis checklist item
+- Standardize bug report template with code placeholder
+- Standardize `phpunit.xml` with environment variables
+- Remove redundant `phpstan/phpstan` and `phpstan/extension-installer` from require-dev
+
 ## [1.1.0] - 2026-04-01
 
 ### Added

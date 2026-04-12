@@ -17,25 +17,20 @@ Laravel middleware that generates or propagates correlation IDs for request trac
 composer require philiprehberger/laravel-correlation-id
 ```
 
-Laravel's auto-discovery registers the service provider automatically.
+The service provider is registered automatically via Laravel package auto-discovery.
 
-### Publish the config (optional)
+Optionally publish the config:
 
 ```bash
 php artisan vendor:publish --tag=correlation-id-config
 ```
 
-This copies `config/correlation-id.php` into your application so you can customise it.
-
 ## Usage
-
-### Register the Middleware
-
-Add the middleware to your HTTP kernel in `bootstrap/app.php`:
 
 ```php
 use PhilipRehberger\CorrelationId\AddCorrelationId;
 
+// Register the middleware in bootstrap/app.php
 ->withMiddleware(function (Middleware $middleware) {
     $middleware->prepend(AddCorrelationId::class);
 })
@@ -44,14 +39,14 @@ use PhilipRehberger\CorrelationId\AddCorrelationId;
 ### Accessing the Correlation ID
 
 ```php
-// From the request object
-$correlationId = $request->attributes->get('correlation_id');
-
-// Via the helper class
 use PhilipRehberger\CorrelationId\CorrelationId;
 
+// Via the helper class
 $id = CorrelationId::get();
 CorrelationId::set('my-custom-id');
+
+// Via the request macro
+$id = $request->correlationId();
 ```
 
 ### Configuration
@@ -63,6 +58,7 @@ return [
     'response_header' => 'X-Request-Id',
     'log_context_key' => 'correlation_id',
     'sentry'          => true,
+    'generator'       => 'uuid',
 ];
 ```
 
@@ -70,9 +66,29 @@ return [
 
 1. The middleware inspects incoming request headers in the order defined by `request_headers`.
 2. The first non-empty value found is used as-is (propagation path).
-3. When no matching header is present, a new UUID v4 is generated.
+3. When no matching header is present, a new ID is generated using the configured generator.
 4. The ID is stored as a request attribute and shared with the log context.
 5. After the handler returns, the ID is written to the response header defined by `response_header`.
+
+### Custom ID Generator
+
+Control how new correlation IDs are generated when no upstream header is present:
+
+```php
+// config/correlation-id.php
+
+// UUID v4 (default)
+'generator' => 'uuid',
+
+// UUID v7 (time-ordered, sortable)
+'generator' => 'uuid7',
+
+// ULID (compact, sortable)
+'generator' => 'ulid',
+
+// Custom callable
+'generator' => fn () => 'prefix-' . bin2hex(random_bytes(16)),
+```
 
 ### Queue Job Propagation
 
@@ -155,18 +171,18 @@ When `sentry/sentry-laravel` is installed and `'sentry' => true`, the middleware
 | `AddCorrelationId` middleware | Generates or propagates the correlation ID and injects it into logs and responses |
 | `CorrelationId::get()` | Read the current correlation ID (`null` if not yet set) |
 | `CorrelationId::set(string $id)` | Override the correlation ID (useful in tests or CLI commands) |
+| `CorrelationId::generate()` | Generate a new correlation ID using the configured generator |
+| `CorrelationId::reset()` | Clear the correlation ID and all trace spans for the current request |
 | `CorrelationId::httpMiddleware(?string $headerName)` | Returns a Guzzle middleware closure for HTTP client propagation |
 | `CorrelationId::startSpan(string $name, array $metadata)` | Start a new trace span linked to the current correlation ID |
 | `CorrelationId::endSpan(Span $span)` | End a span and store it for retrieval |
 | `CorrelationId::spans()` | Get all completed trace spans |
 | `CorrelationId::clearSpans()` | Clear all stored trace spans |
+| `$request->correlationId()` | Request macro that returns the current correlation ID |
 | `TracksCorrelationId` trait | Captures the correlation ID at dispatch time for queue jobs |
 | `CorrelationIdJobMiddleware` | Queue job middleware that restores the correlation ID |
 | `PropagateCorrelationId::handler()` | Static factory for the HTTP client propagation middleware |
 | `Span` value object | Immutable span with `name`, `durationMs()`, `toArray()` |
-| `$request->attributes->get('correlation_id')` | Read the ID from the current request |
-| `X-Request-Id` response header | Outgoing header carrying the correlation ID (configurable) |
-| `correlation_id` log context key | Key injected into every `Log::*` call during the request (configurable) |
 
 ## Development
 
