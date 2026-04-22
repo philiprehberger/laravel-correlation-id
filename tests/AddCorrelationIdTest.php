@@ -9,6 +9,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 use Orchestra\Testbench\TestCase;
 use PhilipRehberger\CorrelationId\AddCorrelationId;
+use PhilipRehberger\CorrelationId\CorrelationId;
 use PhilipRehberger\CorrelationId\CorrelationIdServiceProvider;
 
 class AddCorrelationIdTest extends TestCase
@@ -181,5 +182,30 @@ class AddCorrelationIdTest extends TestCase
             '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i',
             $attributeValue
         );
+    }
+
+    public function test_uses_custom_generator(): void
+    {
+        $this->app['config']->set('correlation-id.generator', fn () => 'custom-generated-id');
+
+        $request = Request::create('/test', 'GET');
+        $this->runMiddleware($request);
+
+        $this->assertSame('custom-generated-id', $request->attributes->get('correlation_id'));
+    }
+
+    public function test_terminate_clears_correlation_state(): void
+    {
+        $request = Request::create('/test', 'GET');
+        $this->app->instance('request', $request);
+
+        $response = $this->runMiddleware($request);
+
+        $this->assertNotNull($request->attributes->get('correlation_id'));
+
+        $middleware = new AddCorrelationId;
+        $middleware->terminate($request, $response);
+
+        $this->assertNull(CorrelationId::get());
     }
 }

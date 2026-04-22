@@ -7,6 +7,7 @@ namespace PhilipRehberger\CorrelationId;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Str;
 use PhilipRehberger\CorrelationId\Middleware\PropagateCorrelationId;
 
 class CorrelationId
@@ -117,5 +118,48 @@ class CorrelationId
     public static function clearSpans(): void
     {
         static::$spans = [];
+    }
+
+    /**
+     * Generate a new correlation ID using the configured generator.
+     *
+     * Supported config values for 'correlation-id.generator':
+     * - 'uuid' (default): UUID v4
+     * - 'uuid7': UUID v7 (time-ordered)
+     * - 'ulid': ULID
+     * - callable: Any callable that returns a string
+     */
+    public static function generate(): string
+    {
+        $generator = config('correlation-id.generator', 'uuid');
+
+        if (is_callable($generator)) {
+            return (string) $generator();
+        }
+
+        return match ($generator) {
+            'uuid7' => (string) Str::uuid7(),
+            'ulid' => (string) Str::ulid(),
+            default => (string) Str::uuid(),
+        };
+    }
+
+    /**
+     * Reset the correlation ID state for the current request.
+     *
+     * Clears the request attribute and all stored spans. Useful for
+     * long-running processes (Octane, queue workers) between requests.
+     */
+    public static function reset(): void
+    {
+        try {
+            /** @var Request $request */
+            $request = App::make('request');
+            $request->attributes->remove('correlation_id');
+        } catch (\Throwable) {
+            // No request available.
+        }
+
+        static::clearSpans();
     }
 }
